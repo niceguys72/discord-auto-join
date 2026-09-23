@@ -19,6 +19,7 @@ To stop watching a channel, right-click it and clear the same option. The select
 ## Behavior and limitations
 
 - The plugin reacts only when another user joins or moves into a watched channel; your own voice-state changes are ignored.
+- The plugin does not move you between channels: if you are already connected to voice, activity in other watched channels is ignored.
 - Discord may still show its normal connection confirmation or fail to connect if you do not have permission, the channel fills up, or the client is otherwise unable to join.
 - Vencord user plugins depend on Discord's internal modules and can occasionally require updates after Discord changes.
 
