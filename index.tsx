@@ -9,7 +9,7 @@ import { definePluginSettings } from "@api/Settings";
 import definePlugin, { OptionType } from "@utils/types";
 import type { Channel } from "@vencord/discord-types";
 import { findByPropsLazy } from "@webpack";
-import { ChannelStore, Menu, showToast, Toasts, UserStore } from "@webpack/common";
+import { ChannelStore, Menu, SelectedChannelStore, showToast, Toasts, UserStore } from "@webpack/common";
 
 interface VoiceStateChangeEvent {
     userId: string;
@@ -79,6 +79,7 @@ export default definePlugin({
         VOICE_STATE_UPDATES({ voiceStates }: { voiceStates: VoiceStateChangeEvent[]; }) {
             const currentUserId = UserStore.getCurrentUser()?.id;
             if (!currentUserId) return;
+            if (SelectedChannelStore.getVoiceChannelId()) return;
 
             const watchedChannelIds = getWatchedChannelIds();
             const joinedState = voiceStates.find(state =>
