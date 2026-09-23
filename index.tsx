@@ -18,6 +18,7 @@ interface VoiceStateChangeEvent {
 }
 
 const { selectVoiceChannel } = findByPropsLazy("selectVoiceChannel", "selectChannel");
+let watchedChannelStyle: HTMLStyleElement | null = null;
 
 const settings = definePluginSettings({
     watchedChannelIds: {
@@ -33,13 +34,31 @@ const settings = definePluginSettings({
 });
 
 function getWatchedChannelIds() {
-    return new Set(settings.store.watchedChannelIds.split(",").map(id => id.trim()).filter(Boolean));
+    return new Set(settings.store.watchedChannelIds
+        .split(",")
+        .map(id => id.trim())
+        .filter(id => /^\d+$/.test(id)));
+}
+
+function updateWatchedChannelStyle() {
+    watchedChannelStyle ??= document.createElement("style");
+    watchedChannelStyle.dataset.vencordName = "AutoVoiceJoin";
+    watchedChannelStyle.textContent = [...getWatchedChannelIds()]
+        .map(channelId => `
+            [data-list-item-id="channels___${channelId}"] [class*="name_"] {
+                color: var(--green-360) !important;
+            }
+        `)
+        .join("\n");
+
+    if (!watchedChannelStyle.isConnected) document.head.append(watchedChannelStyle);
 }
 
 function setChannelWatched(channelId: string, watched: boolean) {
     const channelIds = getWatchedChannelIds();
     watched ? channelIds.add(channelId) : channelIds.delete(channelId);
     settings.store.watchedChannelIds = [...channelIds].join(",");
+    updateWatchedChannelStyle();
 }
 
 const patchChannelContextMenu: NavContextMenuPatchCallback = (children, { channel }: { channel?: Channel; }) => {
@@ -98,5 +117,15 @@ export default definePlugin({
                 showToast(`Joining ${channelName}`, Toasts.Type.SUCCESS);
             }
         }
+    },
+
+    start() {
+        updateWatchedChannelStyle();
+    },
+
+    stop() {
+        watchedChannelStyle?.remove();
+        watchedChannelStyle = null;
     }
 });
+
