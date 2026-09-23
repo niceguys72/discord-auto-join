@@ -1,6 +1,16 @@
-# Auto Voice Join for Vencord
+<p align="center">
+  <img src="assets/auto-voice-join-badge-readme.png" alt="Auto Voice Join mascot" width="220">
+</p>
 
-A private Vencord user plugin that watches selected server voice channels and automatically joins when another user enters one.
+<h1 align="center">Auto Voice Join for Vencord</h1>
+
+<p align="center">
+  <strong>Watch selected voice channels and automatically join when someone arrives.</strong>
+</p>
+
+<p align="center">
+  Private Vencord user plugin · Multi-channel watchlist · Active-channel protection
+</p>
 
 ## Install
 
