@@ -15,6 +15,7 @@ A private Vencord user plugin that watches selected server voice channels and au
 Right-click a server voice or stage channel and enable **Auto-join when someone enters**. Repeat for every channel you want to watch.
 
 To stop watching a channel, right-click it and clear the same option. The selected channels are saved in Vencord's plugin settings.
+Watched channel names are highlighted in green in the channel list so they are easy to identify.
 
 ## Behavior and limitations
 
@@ -26,3 +27,4 @@ To stop watching a channel, right-click it and clear the same option. The select
 ## License
 
 GPL-3.0-or-later. See [LICENSE](LICENSE).
+
