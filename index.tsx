@@ -30,7 +30,7 @@ const settings = definePluginSettings({
     },
     autoLeaveChannelIds: {
         type: OptionType.STRING,
-        description: "Channels with Auto-leave when alone enabled (managed from channel context menus)",
+        description: "Channels with Auto-Leave enabled (managed from channel context menus)",
         default: "",
         onChange: () => scheduleAutoLeave()
     },
@@ -112,7 +112,7 @@ const patchChannelContextMenu: NavContextMenuPatchCallback = (children, { channe
     group.push(
         <Menu.MenuCheckboxItem
             id="vc-auto-voice-join-watch"
-            label="Auto-join when someone enters"
+            label="Auto-Join"
             checked={watched}
             action={() => {
                 setChannelWatched(channel.id, !watched);
@@ -124,7 +124,7 @@ const patchChannelContextMenu: NavContextMenuPatchCallback = (children, { channe
         />,
         <Menu.MenuCheckboxItem
             id="vc-auto-voice-join-leave"
-            label="Auto-leave when alone"
+            label="Auto-Leave"
             checked={autoLeave}
             action={() => {
                 const channelIds = getAutoLeaveChannelIds();
