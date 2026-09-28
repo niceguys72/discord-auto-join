@@ -5,12 +5,18 @@
 <h1 align="center">Auto Voice Join for Vencord</h1>
 
 <p align="center">
-  <strong>Watch selected voice channels and automatically join when someone arrives.</strong>
+  <strong>Join when someone arrives. Leave when you are alone.</strong>
 </p>
 
 <p align="center">
-  Private Vencord user plugin · Multi-channel watchlist · Active-channel protection
+  v1.1.0 · Multi-channel watchlist · Optional auto-leave · Active-channel protection
 </p>
+
+## New in v1.1.0
+
+Right-click a server voice or stage channel and enable **Auto-leave when alone**. When you are the only person remaining, the plugin disconnects you after a 0.5-second recheck. Auto-leave is off by default and saved separately for each channel; it does not require auto-join to be enabled.
+
+Both switches can be enabled together: someone joins → you auto-join → everyone else leaves → you auto-leave. Your existing auto-join selections remain saved.
 
 ## Install
 
@@ -126,9 +132,12 @@ if ($safeDirectories -notcontains $pluginSafe) {
     git config --global --add safe.directory $pluginSafe
 }
 git -C $pluginDir pull --ff-only
+if ($LASTEXITCODE -ne 0) { throw "Plugin update failed. Stop here and resolve the Git error before building." }
 
 Push-Location $vencordDir
 try {
+    pnpm install --frozen-lockfile
+    if ($LASTEXITCODE -ne 0) { throw "Dependency installation failed." }
     pnpm build
     if ($LASTEXITCODE -ne 0) { throw "Vencord build failed." }
     pnpm inject
@@ -137,6 +146,8 @@ try {
 }
 ```
 
+Finish the installer, fully quit Discord from the system tray, and reopen it. Under **Settings → Vencord → Plugins**, keep **AutoVoiceJoin** enabled. Then right-click each desired voice channel and tick **Auto-leave when alone**. No re-cloning or resetting settings is needed.
+
 ## Select channels
 
 Right-click a server voice or stage channel and enable **Auto-join when someone enters**. Repeat for every channel you want to watch.
@@ -144,10 +155,18 @@ Right-click a server voice or stage channel and enable **Auto-join when someone 
 To stop watching a channel, right-click it and clear the same option. The selected channels are saved in Vencord's plugin settings.
 Watched channel names are highlighted in green in the channel list so they are easy to identify.
 
+The same menu also has **Auto-leave when alone**. Tick it on each channel where you want to leave automatically, and untick it to stop. This setting works independently of auto-join; green names continue to indicate the auto-join watchlist.
+
+If you enable auto-leave while already alone, join an empty enabled channel manually, or restart the plugin while alone in an enabled channel, it will disconnect you after the same short recheck. Disable the checkbox first if you want to wait there alone.
+
+To test, join an enabled channel with another person, then have them leave. You should disconnect. With two other people present, one leaving must keep you connected. If someone rejoins during the short recheck, you stay connected. Bots count as other occupants.
+
 ## Behavior and limitations
 
 - The plugin reacts only when another user joins or moves into a watched channel; your own voice-state changes are ignored.
 - The plugin does not move you between channels: if you are already connected to voice, activity in other watched channels is ignored.
+- Auto-leave only affects your current channel when explicitly enabled there. It confirms your own voice state and that no other occupants remain before disconnecting; empty or unavailable voice-state data does not trigger a disconnect.
+- Switching channels, disabling auto-leave, or disabling the plugin cancels or invalidates a pending auto-leave. It does not disconnect you from a different channel.
 - Discord may still show its normal connection confirmation or fail to connect if you do not have permission, the channel fills up, or the client is otherwise unable to join.
 - Vencord user plugins depend on Discord's internal modules and can occasionally require updates after Discord changes.
 
