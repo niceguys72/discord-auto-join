@@ -148,6 +148,35 @@ try {
 
 Finish the installer, fully quit Discord from the system tray, and reopen it. Under **Settings → Vencord → Plugins**, keep **AutoVoiceJoin** enabled. Then right-click each desired voice channel and tick **Auto-Leave**. No re-cloning or resetting settings is needed.
 
+### Repair Auto Voice Join in an existing Vencord installation
+
+Use this when Vencord updated and Auto Voice Join stopped loading, disappeared, or showed a build error. This repairs the existing source checkout in `Documents\Vencord`; it does not reinstall Discord or start over. Open PowerShell and paste the commands **in order**, waiting for each command to finish:
+
+```powershell
+$vencordDir = Join-Path $env:USERPROFILE "Documents\Vencord"
+$pluginDir = Join-Path $vencordDir "src\userplugins\autoVoiceJoin"
+
+git config --global --add safe.directory ($vencordDir.Replace("\", "/"))
+git config --global --add safe.directory ($pluginDir.Replace("\", "/"))
+
+git -C $vencordDir pull --ff-only
+if ($LASTEXITCODE -ne 0) { throw "Vencord update failed. Stop here and resolve the Git error." }
+
+git -C $pluginDir pull --ff-only
+if ($LASTEXITCODE -ne 0) { throw "Plugin update failed. Stop here and resolve the Git error." }
+
+Set-Location $vencordDir
+pnpm install --frozen-lockfile
+if ($LASTEXITCODE -ne 0) { throw "Dependency installation failed." }
+
+pnpm build
+if ($LASTEXITCODE -ne 0) { throw "Build failed. Do not run the installer until the build succeeds." }
+
+pnpm inject
+```
+
+When the installer opens, patch your Discord installation. Fully quit Discord from the system tray and reopen it. Your existing watched-channel settings are stored in Discord and normally remain in place. If PowerShell says `pnpm` is not recognized, install pnpm first; if Git reports a different repository as dubious, add that exact repository path as a Git safe directory before continuing.
+
 ## Select channels
 
 Right-click a server voice or stage channel and enable **Auto-Join** to join automatically when someone enters. Repeat for every channel you want to watch.
