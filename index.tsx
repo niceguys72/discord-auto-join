@@ -9,7 +9,7 @@ import { definePluginSettings } from "@api/Settings";
 import definePlugin, { OptionType } from "@utils/types";
 import type { Channel } from "@vencord/discord-types";
 import { findByPropsLazy } from "@webpack";
-import { ChannelStore, Menu, SelectedChannelStore, showToast, Toasts, UserStore, VoiceStateStore } from "@webpack/common";
+import { ChannelStore, Menu, SelectedChannelStore, showToast, UserStore, VoiceStateStore } from "@webpack/common";
 
 interface VoiceStateChangeEvent {
     userId: string;
@@ -116,10 +116,7 @@ const patchChannelContextMenu: NavContextMenuPatchCallback = (children, { channe
             checked={watched}
             action={() => {
                 setChannelWatched(channel.id, !watched);
-                showToast(
-                    `${!watched ? "Watching" : "Stopped watching"} ${channel.name}`,
-                    Toasts.Type.MESSAGE
-                );
+                showToast({ text: `${!watched ? "Watching" : "Stopped watching"} ${channel.name}` });
             }}
         />,
         <Menu.MenuCheckboxItem
@@ -131,7 +128,7 @@ const patchChannelContextMenu: NavContextMenuPatchCallback = (children, { channe
                 autoLeave ? channelIds.delete(channel.id) : channelIds.add(channel.id);
                 settings.store.autoLeaveChannelIds = [...channelIds].join(",");
                 scheduleAutoLeave();
-                showToast(`${autoLeave ? "Disabled" : "Enabled"} auto-leave for ${channel.name}`, Toasts.Type.MESSAGE);
+                showToast({ text: `${autoLeave ? "Disabled" : "Enabled"} auto-leave for ${channel.name}` });
             }}
         />
     );
@@ -173,7 +170,7 @@ export default definePlugin({
 
             if (settings.store.showJoinToast) {
                 const channelName = ChannelStore.getChannel(joinedState.channelId)?.name ?? "watched voice channel";
-                showToast(`Joining ${channelName}`, Toasts.Type.SUCCESS);
+                showToast({ text: `Joining ${channelName}`, variant: "success" });
             }
         }
     },
